@@ -1,0 +1,36 @@
+{
+  "publishes": "ordering.events",
+  "subscriptions": [
+    {
+      "topic": "catalog.events",
+      "event_types": [
+        "lagoski.catalog.product.published.v1",
+        "lagoski.catalog.variant.price-changed.v1",
+        "lagoski.catalog.product.discontinued.v1"
+      ]
+    },
+    {
+      "topic": "inventory.events",
+      "event_types": [
+        "lagoski.inventory.stock.reserved.v1",
+        "lagoski.inventory.stock.reservation-rejected.v1",
+        "lagoski.inventory.reservation.expired.v1"
+      ]
+    },
+    {
+      "topic": "payment.events",
+      "event_types": [
+        "lagoski.payment.payment.requested.v1",
+        "lagoski.payment.payment.authorized.v1",
+        "lagoski.payment.payment.declined.v1"
+      ]
+    },
+    {
+      "topic": "fulfillment.events",
+      "event_types": [
+        "lagoski.fulfillment.shipment.dispatched.v1",
+        "lagoski.fulfillment.shipment.delivered.v1"
+      ]
+    }
+  ]
+}

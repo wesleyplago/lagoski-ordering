@@ -1,0 +1,38 @@
+{
+  "name": "lagoski-ordering",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Lagoski Ordering: Carrinho, pedido e a saga de checkout. Contexto core: decide o ciclo de vida do pedido.",
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=.env src/main.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:contracts": "vitest run test/contracts.test.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sns": "^3.716.0",
+    "@aws-sdk/client-sqs": "^3.716.0",
+    "@google-cloud/pubsub": "^4.9.0",
+    "fastify": "^5.2.1",
+    "google-auth-library": "^9.15.0",
+    "pg": "^8.13.1",
+    "ulid": "^2.3.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.11.10",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "~5.9.3",
+    "vitest": "^3.2.4"
+  }
+}

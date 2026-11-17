@@ -1,0 +1,3 @@
+bucket = "lagoski-tfstate-<account-id>"
+key    = "lagoski-ordering/aws/dev/terraform.tfstate"
+region = "us-east-1"

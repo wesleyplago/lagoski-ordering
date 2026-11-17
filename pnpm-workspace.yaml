@@ -1,0 +1,9 @@
+# Dependências com script de instalação liberadas explicitamente.
+# pnpm >= 11
+allowBuilds:
+  esbuild: true
+  protobufjs: true
+# pnpm <= 10
+onlyBuiltDependencies:
+  - esbuild
+  - protobufjs

@@ -1,0 +1,86 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  # Versão dos contratos (lagoski-contracts) contra a qual este serviço é verificado.
+  CONTRACTS_REF: v0.1.0
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  contracts:
+    name: contratos (lagoski-contracts ${{ github.event_name == 'pull_request' && 'PR' || 'main' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: wesleyplago/lagoski-contracts
+          ref: ${{ env.CONTRACTS_REF }}
+          path: contracts-cache
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Eventos produzidos e consumidos batem com os JSON Schemas publicados
+        run: pnpm test:contracts
+        env:
+          CONTRACTS_DIR: ${{ github.workspace }}/contracts-cache
+
+  terraform:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+      - uses: terraform-linters/setup-tflint@v4
+      - run: terraform fmt -check -recursive infrastructure
+      - name: validate (aws/dev e gcp/dev)
+        run: |
+          for env in infrastructure/environments/aws/dev infrastructure/environments/gcp/dev; do
+            terraform -chdir=$env init -backend=false -input=false
+            terraform -chdir=$env validate
+          done
+      - name: tflint
+        run: |
+          tflint --init --config "$GITHUB_WORKSPACE/infrastructure/.tflint.hcl"
+          tflint --recursive --config "$GITHUB_WORKSPACE/infrastructure/.tflint.hcl" --chdir infrastructure
+
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: lagoski-ordering:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
